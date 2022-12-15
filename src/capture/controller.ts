@@ -1,6 +1,7 @@
 import { FastifyRequest } from 'fastify'
 import uuid from 'short-uuid'
 import { server } from '..'
+import { cleanTemp, packageTaskFilesToBuffer } from './file'
 import { captureRunner } from './pptr'
 import { CaptureOptions, CaptureRequestBodyType, CaptureTask } from './typing'
 
@@ -63,13 +64,14 @@ async function captureController(
 
   server.log.info({ task }, 'CaptureController: task')
 
-  // call pptr to generate images
-  await captureRunner(task)
-
-  // package images
-  // return zip file
-
-  return 'capture'
+  try {
+    const captureResult = await captureRunner(task)
+    return await packageTaskFilesToBuffer(captureResult)
+  } catch (error) {
+    throw error
+  } finally {
+    cleanTemp(taskId)
+  }
 }
 
 export function register() {

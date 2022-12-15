@@ -11,11 +11,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "adm-zip": "^0.5.9",
     "fastify": "^4.10.2",
     "puppeteer": "^19.4.0",
     "short-uuid": "^4.2.2"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.0",
     "@types/node": "^18.11.15",
     "node-dev": "^7.4.3",
     "prettier": "^2.8.1",

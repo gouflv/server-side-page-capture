@@ -1,6 +1,6 @@
 import pptr, { Browser, ScreenshotOptions } from 'puppeteer'
 import { server } from '..'
-import { mkdirTemp, resolveTempFilePath } from './file'
+import { cleanTemp, mkdirTemp, resolveTempFilePath } from './file'
 import { CaptureOptions, CaptureTask } from './typing'
 
 export async function captureRunner(task: CaptureTask) {
@@ -11,16 +11,14 @@ export async function captureRunner(task: CaptureTask) {
   await mkdirTemp(taskId)
 
   try {
-    // for loop jobs
-    for await (const job of jobs) {
+    for (const job of jobs) {
       server.log.debug(`job[${job.index}] start`)
       job.file = await openPageAndCapture(taskId, browser, job, options)
     }
-
     server.log.info({ task }, 'captureRunner done')
-
     return task
   } catch (error) {
+    await cleanTemp(taskId)
     throw error
   } finally {
     await browser.close()
