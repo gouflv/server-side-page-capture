@@ -56,8 +56,7 @@ async function openPageAndCapture(
   }
 
   async function captureElement(selector: string) {
-    await page.waitForSelector(selector)
-    const el = await page.$(selector)
+    const el = await page.waitForSelector(selector)
     if (!el) {
       throw new Error(`Element not found: ${selector}`)
     }
@@ -65,6 +64,8 @@ async function openPageAndCapture(
   }
 
   const page = await browser.newPage()
+
+  page.setDefaultTimeout(10_000)
 
   await page.setViewport({
     width: options.viewportWidth,

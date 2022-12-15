@@ -1,4 +1,4 @@
-import { FastifyRequest } from 'fastify'
+import { FastifyReply, FastifyRequest } from 'fastify'
 import uuid from 'short-uuid'
 import { server } from '..'
 import { cleanTemp, packageTaskFilesToBuffer } from './file'
@@ -38,7 +38,8 @@ function generateTaskId() {
 }
 
 async function captureController(
-  req: FastifyRequest<{ Body: CaptureRequestBodyType }>
+  req: FastifyRequest<{ Body: CaptureRequestBodyType }>,
+  reply: FastifyReply
 ) {
   const { body } = req
 
@@ -66,7 +67,16 @@ async function captureController(
 
   try {
     const captureResult = await captureRunner(task)
-    return await packageTaskFilesToBuffer(captureResult)
+    const buffer = await packageTaskFilesToBuffer(captureResult)
+
+    reply
+      .headers({
+        'Content-Type': {
+          zip: 'application/zip; charset=utf-8'
+        }[options.responseFormat],
+        'Content-Disposition': `attachment; filename="${taskId}.zip"`
+      })
+      .send(buffer)
   } catch (error) {
     throw error
   } finally {
