@@ -9,7 +9,8 @@
 | Params         | Type     | Description                                                  |
 | -------------- | -------- | ------------------------------------------------------------ |
 | urls           | string[] | **页面地址**<br />**必填**，最大长度 100。                   |
-| viewportSize   | string   | **浏览器窗口大小**<br />格式：`{width}x{height}`。默认值：375x667。 |
+| viewportWidth  | number   | **浏览器窗口大小**<br />默认值：750。                        |
+| viewportHeight | number   | 默认值：1334                                                 |
 | selector       | string   | **截取指定元素**<br />传入的 `selector` 语法参照 `document.querySelector`。<br />不指定 _或_ 指定元素不存在时，截取整个页面。 |
 | imageFormat    | string   | **图片格式**<br />格式：`jpeg` _或_ `png`。默认值：`jpeg。`  |
 | quality        | number   | **图片质量**<br />针对 `jpeg`<br />格式：0-100。默认值：80。 |

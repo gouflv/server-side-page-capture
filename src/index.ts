@@ -1,11 +1,11 @@
 import fastify from 'fastify'
-import * as CaptureModule from './capture'
+import * as CaptureController from './capture/controller'
 
 export const server = fastify({
-  // logger: true,
+  logger: true
 })
 
-CaptureModule.register()
+CaptureController.register()
 
 server.get('/ping', async (request, reply) => {
   return 'pong!'

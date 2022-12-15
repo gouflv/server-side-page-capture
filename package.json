@@ -11,7 +11,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "fastify": "^4.10.2"
+    "fastify": "^4.10.2",
+    "puppeteer": "^19.4.0",
+    "short-uuid": "^4.2.2"
   },
   "devDependencies": {
     "@types/node": "^18.11.15",
