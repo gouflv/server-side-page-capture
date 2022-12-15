@@ -2,7 +2,9 @@ import fastify from 'fastify'
 import * as CaptureController from './capture/controller'
 
 export const server = fastify({
-  logger: true
+  logger: {
+    level: 'debug'
+  }
 })
 
 CaptureController.register()
