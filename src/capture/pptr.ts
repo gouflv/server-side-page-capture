@@ -20,7 +20,7 @@ export async function captureRunner(task: CaptureTask) {
     server.log.info({ task }, 'captureRunner done')
     return task
   } catch (error) {
-    await cleanTemp(taskId)
+    cleanTemp(taskId)
     throw error
   } finally {
     if (!isHeadFull) await browser.close()
@@ -91,6 +91,6 @@ async function openPageAndCapture(
   } catch (error) {
     throw error
   } finally {
-    if (!isHeadFull) page.close()
+    if (!isHeadFull) await page.close()
   }
 }
