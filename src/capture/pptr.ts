@@ -33,8 +33,9 @@ async function launch(options: CaptureOptions) {
     ignoreHTTPSErrors: true,
     executablePath:
       process.env.NODE_ENV === 'production'
-        ? undefined
-        : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+        ? '/usr/bin/google-chrome'
+        : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
   })
   return browser
 }
