@@ -52,11 +52,35 @@ Connection: close
 
 ## Deploy
 
+### Docker
+
 1. [Install Docker](https://docs.docker.com/engine/install/) 
-2. Run `sh scripts/docker-deploy.sh`
+2. Run `sh docker-build.sh`
+3. Run `sh docker-run.sh`
+
+### Manual
+
+- Node.js 16+
+- [Install System Dependencies](https://pptr.dev/troubleshooting#chrome-headless-doesnt-launch-on-unix)
+- Install Project Dependencies `yarn install --forzen-lock`
+- Run `yarn start`
+  - Default port `8080`, use  `PORT` env variable to specify
+  - Example:   `PORT=6666 yarn start` 
+
 
 ## Development Guide
 
+### Tech Stack
+
 - [Fastify](https://www.fastify.io/)
 - [Puppetter](https://pptr.dev/)
+  - [Running in Docker](https://pptr.dev/troubleshooting/#running-puppeteer-in-docker)
+  - [How to use Puppeteer inside a Docker container](https://dev.to/cloudx/how-to-use-puppeteer-inside-a-docker-container-568c)
 - [Docker Image](https://hub.docker.com/r/satantime/puppeteer-node)
+
+### For MacOS arm64
+
+```sh
+docker build --platform linux/arm64 -t $tag_name .
+```
+
