@@ -1,5 +1,7 @@
 FROM ghlx/puppeteer:puppeteer-latest 
 
+USER root
+
 # Prevent puppeteer from downloading chrome
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
