@@ -5,11 +5,11 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "node-dev src/index.ts",
+    "start": "NODE_ENV=production ts-node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "lv.gouf@gmail.com",
   "dependencies": {
     "adm-zip": "^0.5.9",
     "fastify": "^4.10.2",

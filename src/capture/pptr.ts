@@ -3,6 +3,8 @@ import { server } from '..'
 import { cleanTemp, mkdirTemp, resolveTempFilePath } from './file'
 import { CaptureOptions, CaptureTask } from './typing'
 
+const isHeadFull = process.env.HEAD_FULL ? true : false
+
 export async function captureRunner(task: CaptureTask) {
   const { taskId, jobs, options } = task
 
@@ -21,15 +23,18 @@ export async function captureRunner(task: CaptureTask) {
     await cleanTemp(taskId)
     throw error
   } finally {
-    await browser.close()
+    if (!isHeadFull) await browser.close()
   }
 }
 
 async function launch(options: CaptureOptions) {
   const browser = await pptr.launch({
-    headless: true,
+    headless: !isHeadFull,
     ignoreHTTPSErrors: true,
-    args: [`--window-size=${options.viewportWidth},${options.viewportHeight}`]
+    executablePath:
+      process.env.NODE_ENV === 'production'
+        ? undefined
+        : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
   })
   return browser
 }
@@ -85,6 +90,6 @@ async function openPageAndCapture(
   } catch (error) {
     throw error
   } finally {
-    await page.close()
+    if (!isHeadFull) page.close()
   }
 }

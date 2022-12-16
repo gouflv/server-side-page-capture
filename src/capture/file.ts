@@ -32,9 +32,18 @@ export function packageTaskFilesToBuffer(task: CaptureTask) {
     zipFile.addLocalFile(job.file!)
   })
 
-  // local
-  // const zipFilePath = resolveTempFilePath(taskId, 'images.zip')
-  // zipFile.writeZip(zipFilePath)
-
   return zipFile.toBufferPromise()
+}
+
+export async function packageTaskFilesToFile(task: CaptureTask) {
+  const { taskId, jobs } = task
+
+  const zipFile = new zip()
+  jobs.forEach((job) => {
+    zipFile.addLocalFile(job.file!)
+  })
+
+  const zipFilePath = resolveTempFilePath(taskId, 'images.zip')
+  await zipFile.writeZipPromise(zipFilePath)
+  return zipFilePath
 }
