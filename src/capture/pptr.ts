@@ -58,6 +58,12 @@ async function openPageAndCapture(
   }
 
   async function captureFull() {
+    // Full page hack in viewport
+    const height = await page.evaluate(() => document.body.scrollHeight)
+    await page.setViewport({
+      width: options.viewportWidth,
+      height
+    })
     await page.screenshot({ ...screenshotOptions, fullPage: true })
   }
 
