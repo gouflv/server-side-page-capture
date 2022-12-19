@@ -27,7 +27,7 @@ zip 格式的二进制流
 Requeset
 
 ```sh
-curl -X "POST" "http://localhost:8080/capture" \
+curl -X "POST" "http://localhost:7980/capture" \
      -H 'Content-Type: application/json; charset=utf-8' \
      -d $'{
   "urls": [
@@ -57,15 +57,16 @@ Connection: close
 1. [Install Docker](https://docs.docker.com/engine/install/) 
 2. Run `sh docker-build.sh`
 3. Run `sh docker-run.sh`
+   - Default port `7980`
 
 ### Manual
 
 - Node.js 16+
-- [Install System Dependencies](https://pptr.dev/troubleshooting#chrome-headless-doesnt-launch-on-unix)
+- [Install Chrome and fonts](https://pptr.dev/troubleshooting#chrome-headless-doesnt-launch-on-unix)
 - Install Project Dependencies `yarn install --forzen-lock`
 - Run `yarn start`
-  - Default port `8080`, use  `PORT` env variable to specify
-  - Example:   `PORT=6666 yarn start` 
+  - Default port `8080`
+  - Use  `PORT` env variable to specify:  `PORT=6666 yarn start` 
 
 
 ## Development Guide
@@ -76,7 +77,10 @@ Connection: close
 - [Puppetter](https://pptr.dev/)
   - [Running in Docker](https://pptr.dev/troubleshooting/#running-puppeteer-in-docker)
   - [How to use Puppeteer inside a Docker container](https://dev.to/cloudx/how-to-use-puppeteer-inside-a-docker-container-568c)
-- [Docker Image](https://hub.docker.com/r/satantime/puppeteer-node)
+- Docker Image
+  - https://hub.docker.com/r/zenato/puppeteer
+  - https://hub.docker.com/r/ghlx/puppeteer/tags
+
 
 ### For MacOS arm64
 
