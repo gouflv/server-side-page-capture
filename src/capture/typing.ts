@@ -1,13 +1,20 @@
 export type RequiredField<T, K extends keyof T> = T & Required<Pick<T, K>>
 
-export type CaptureRequestBodyType = {
-  urls: string[]
+export type CaptureBaseType = {
   viewportWidth: number
   viewportHeight: number
   selector?: string
   imageFormat?: 'png' | 'jpeg'
   quality?: number
   responseFormat?: 'zip'
+}
+
+export type CaptureRequestBodyType = CaptureBaseType & {
+  urls: string[]
+}
+
+export type CaptureRequestQuerystringType = CaptureBaseType & {
+  url: string
 }
 
 export type CaptureOptions = RequiredField<

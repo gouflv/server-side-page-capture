@@ -1,31 +1,50 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
+import fs from 'node:fs/promises'
 import uuid from 'short-uuid'
 import { server } from '..'
 import { cleanTemp, packageTaskFilesToBuffer } from './file'
 import { captureRunner } from './pptr'
-import { CaptureOptions, CaptureRequestBodyType, CaptureTask } from './typing'
+import {
+  CaptureBaseType,
+  CaptureOptions,
+  CaptureRequestBodyType,
+  CaptureRequestQuerystringType,
+  CaptureTask
+} from './typing'
+
+const commonSchemaProperties: Record<keyof CaptureBaseType, any> = {
+  viewportWidth: { type: 'number' },
+  viewportHeight: { type: 'number' },
+  selector: { type: 'string' },
+  imageFormat: { type: 'string', enum: ['jpeg', 'png'] },
+  quality: { type: 'integer', minimum: 0, maximum: 100 },
+  responseFormat: { type: 'string', enum: ['zip'] }
+}
+
+const queryStringSchema = {
+  type: 'object',
+  required: ['url'],
+  properties: {
+    ...commonSchemaProperties,
+    url: { type: 'string', format: 'uri' }
+  } as Record<keyof CaptureRequestQuerystringType, any>
+}
 
 const bodyJSONSchema = {
   type: 'object',
   required: ['urls'],
   properties: {
+    ...commonSchemaProperties,
     urls: {
       type: 'array',
       items: { type: 'string', format: 'uri' },
       minItems: 1,
       maxItems: 100
-    },
-    viewportWidth: { type: 'integer' },
-    viewportHeight: { type: 'integer' },
-    selector: { type: 'string' },
-    imageFormat: { type: 'string', enum: ['png', 'jpeg'] },
-    quality: { type: 'integer', minimum: 0, maximum: 100 },
-    responseFormat: { type: 'string', enum: ['zip'] }
+    }
   } as Record<keyof CaptureRequestBodyType, any>
 }
 
-const defaultOptions: CaptureOptions = {
-  urls: [],
+const defaultOptions: Partial<CaptureOptions> = {
   viewportWidth: 750,
   viewportHeight: 1334,
   imageFormat: 'jpeg',
@@ -38,14 +57,16 @@ function generateTaskId() {
 }
 
 async function captureController(
-  req: FastifyRequest<{ Body: CaptureRequestBodyType }>,
+  req: FastifyRequest<{
+    Body: Partial<CaptureRequestBodyType>
+  }>,
   reply: FastifyReply
 ) {
   const { body } = req
 
   const options: CaptureOptions = {
     ...defaultOptions,
-    ...body
+    ...(body as any)
   }
 
   server.log.info({ body: req.body }, 'CaptureController: income')
@@ -56,14 +77,14 @@ async function captureController(
   const task: CaptureTask = {
     taskId,
     jobs: options.urls.map((url, index) => ({
-      url,
+      url: options.urls[0],
       index,
       status: 'pending'
     })),
     options
   }
 
-  server.log.info({ task }, 'CaptureController: task')
+  server.log.info({ task }, 'CaptureOneController: task')
 
   try {
     const captureResult = await captureRunner(task)
@@ -84,6 +105,55 @@ async function captureController(
   }
 }
 
+async function captureOneController(
+  req: FastifyRequest<{ Querystring: CaptureRequestQuerystringType }>,
+  reply: FastifyReply
+) {
+  const { query } = req
+
+  const options: CaptureOptions = {
+    ...defaultOptions,
+    ...(query as any),
+    urls: [query.url]
+  }
+
+  server.log.info({ query: req.query }, 'CaptureOneController: income')
+  server.log.info({ options }, 'CaptureOneController: options')
+
+  const taskId = generateTaskId()
+
+  const task: CaptureTask = {
+    taskId,
+    jobs: [
+      {
+        url: options.urls[0],
+        index: 0,
+        status: 'pending'
+      }
+    ],
+    options
+  }
+
+  try {
+    const captureResult = await captureRunner(task)
+
+    reply.headers({
+      'Content-Type': {
+        jpeg: 'application/jpeg; charset=utf-8',
+        png: 'application/png; charset=utf-8'
+      }[options.imageFormat],
+      'Content-Disposition': `attachment; filename="${taskId}.${options.imageFormat}"`
+    })
+
+    const buffer = await fs.readFile(captureResult.jobs[0].file!)
+    reply.send(buffer)
+  } catch (error) {
+    throw error
+  } finally {
+    cleanTemp(taskId)
+  }
+}
+
 export function register() {
   server.post(
     '/capture',
@@ -93,5 +163,14 @@ export function register() {
       }
     },
     captureController
+  )
+  server.get(
+    '/capture-one',
+    {
+      schema: {
+        querystring: queryStringSchema
+      }
+    },
+    captureOneController
   )
 }

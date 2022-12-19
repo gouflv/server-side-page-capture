@@ -10,8 +10,8 @@
 | -------------- | -------- | ------------------------------------------------------------ |
 | urls           | string[] | **页面地址**<br />**必填**，最大长度 100。                   |
 | viewportWidth  | number   | **浏览器窗口大小**<br />默认值：750。                        |
-| viewportHeight | number   | 默认值：1334                                                 |
-| selector       | string   | **截取指定元素**<br />传入的 `selector` 语法参照 `document.querySelector`。<br />不指定 _或_ 指定元素不存在时，截取整个页面。 |
+| viewportHeight | number   | 默认值：1334<br />截取整个页面时，忽略该参数                 |
+| selector       | string   | **截取指定元素**<br />传入的 `selector` 语法参照 `document.querySelector`。<br />不指定时，截取整个页面。 |
 | imageFormat    | string   | **图片格式**<br />格式：`jpeg` _或_ `png`。默认值：`jpeg`。  |
 | quality        | number   | **图片质量**<br />针对 `jpeg`<br />格式：0-100。默认值：80。 |
 | responseFormat | string   | **返回的文件流格式**<br />格式： `zip`。                     |
@@ -49,6 +49,34 @@ Connection: close
 
 ...
 ```
+
+### GET `/capture-one`
+
+用于请求单个 url，并直接返回图片文件流。
+
+#### Example
+
+Request
+
+```sh
+// 可通过浏览器直接访问
+http://localhost:8080/capture-one?url=http%3A%2F%2Fm.baidu.com
+```
+
+Response
+
+```http
+HTTP/1.1 200 OK
+content-type: application/jpeg; charset=utf-8
+content-disposition: attachment; filename="kP8EFQ7LhWCezqiXf2PtgT.jpeg"
+content-length: 152239
+Date: Mon, 19 Dec 2022 06:36:22 GMT
+Connection: close
+
+...
+```
+
+
 
 ## Deploy
 
