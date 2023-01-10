@@ -19,11 +19,7 @@ export type CaptureRequestQuerystringType = CaptureBaseType & {
 
 export type CaptureOptions = RequiredField<
   CaptureRequestBodyType,
-  | 'viewportWidth'
-  | 'viewportHeight'
-  | 'imageFormat'
-  | 'quality'
-  | 'responseFormat'
+  'viewportWidth' | 'viewportHeight' | 'imageFormat' | 'responseFormat'
 >
 
 export type CaptureTask = {

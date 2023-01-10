@@ -69,6 +69,10 @@ async function captureController(
     ...(body as any)
   }
 
+  if (options.imageFormat === 'png') {
+    options.quality = undefined
+  }
+
   server.log.info({ body: req.body }, 'CaptureController: income')
   server.log.info({ options }, 'CaptureController: options')
 
@@ -115,6 +119,10 @@ async function captureOneController(
     ...defaultOptions,
     ...(query as any),
     urls: [query.url]
+  }
+
+  if (options.imageFormat === 'png') {
+    options.quality = undefined
   }
 
   server.log.info({ query: req.query }, 'CaptureOneController: income')
