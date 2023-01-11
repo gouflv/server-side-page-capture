@@ -9,10 +9,10 @@
 | Params         | Type     | Description                                                  |
 | -------------- | -------- | ------------------------------------------------------------ |
 | urls           | string[] | **页面地址**<br />**必填**，最大长度 100。                   |
-| viewportWidth  | number   | **浏览器窗口大小**<br />默认值：750。                        |
-| viewportHeight | number   | 默认值：1334<br />截取整个页面时，忽略该参数                 |
+| viewportWidth  | number   | **浏览器窗口大小**<br />默认值：375。                        |
+| viewportHeight | number   | 默认值：667<br />截取整个页面时，忽略该参数                  |
 | selector       | string   | **截取指定元素**<br />传入的 `selector` 语法参照 `document.querySelector`。<br />不指定时，截取整个页面。 |
-| imageFormat    | string   | **图片格式**<br />格式：`jpeg` _或_ `png`。默认值：`jpeg`。  |
+| imageFormat    | string   | **图片格式**<br />格式：`jpeg`  `png` `pdf`。默认值：`jpeg`。 |
 | quality        | number   | **图片质量**<br />针对 `jpeg`<br />格式：0-100。默认值：80。 |
 | responseFormat | string   | **返回的文件流格式**<br />格式： `zip`。                     |
 
@@ -52,7 +52,7 @@ Connection: close
 
 ### GET `/capture-one`
 
-用于请求单个 url，并直接返回图片文件流。
+用于请求单个 url，并直接返回图片文件流。请求参数参考 `/capture`。
 
 #### Example
 

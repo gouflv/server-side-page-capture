@@ -45,8 +45,8 @@ const bodyJSONSchema = {
 }
 
 const defaultOptions: Partial<CaptureOptions> = {
-  viewportWidth: 750,
-  viewportHeight: 1334,
+  viewportWidth: 375,
+  viewportHeight: 667,
   imageFormat: 'jpeg',
   quality: 80,
   responseFormat: 'zip'
