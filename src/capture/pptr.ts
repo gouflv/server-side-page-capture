@@ -1,4 +1,4 @@
-import pptr, { Browser, ScreenshotOptions } from 'puppeteer'
+import pptr, { Browser, PDFOptions, ScreenshotOptions } from 'puppeteer'
 import { server } from '..'
 import { cleanTemp, mkdirTemp, resolveTempFilePath } from './file'
 import { CaptureOptions, CaptureTask } from './typing'
@@ -51,28 +51,24 @@ async function openPageAndCapture(
     `${job.index}.${options.imageFormat}`
   )
 
-  const screenshotOptions: ScreenshotOptions = {
-    path: filePath,
-    type: options.imageFormat,
-    quality: options.quality
+  async function getPageHeight() {
+    return await page.evaluate(() => document.body.scrollHeight)
   }
 
-  async function captureFull() {
-    // Full page hack in viewport
-    const height = await page.evaluate(() => document.body.scrollHeight)
+  async function captureFull(opts: ScreenshotOptions) {
     await page.setViewport({
       width: options.viewportWidth,
-      height
+      height: await getPageHeight()
     })
-    await page.screenshot({ ...screenshotOptions, fullPage: true })
+    await page.screenshot({ ...opts, fullPage: true })
   }
 
-  async function captureElement(selector: string) {
+  async function captureElement(selector: string, opts: ScreenshotOptions) {
     const el = await page.waitForSelector(selector)
     if (!el) {
       throw new Error(`Element not found: ${selector}`)
     }
-    await el.screenshot(screenshotOptions)
+    await el.screenshot(opts)
   }
 
   const page = await browser.newPage()
@@ -87,10 +83,25 @@ async function openPageAndCapture(
   try {
     await page.goto(job.url, { waitUntil: 'networkidle0' })
 
-    if (options.selector) {
-      await captureElement(options.selector)
+    if (options.imageFormat === 'pdf') {
+      const pdfOptions: PDFOptions = {
+        path: filePath,
+        width: options.viewportWidth,
+        printBackground: true
+      }
+      await page.pdf(pdfOptions)
     } else {
-      await captureFull()
+      const screenshotOptions: ScreenshotOptions = {
+        path: filePath,
+        type: options.imageFormat,
+        quality: options.quality
+      }
+
+      if (options.selector) {
+        await captureElement(options.selector, screenshotOptions)
+      } else {
+        await captureFull(screenshotOptions)
+      }
     }
 
     return filePath

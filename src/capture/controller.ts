@@ -16,7 +16,7 @@ const commonSchemaProperties: Record<keyof CaptureBaseType, any> = {
   viewportWidth: { type: 'number' },
   viewportHeight: { type: 'number' },
   selector: { type: 'string' },
-  imageFormat: { type: 'string', enum: ['jpeg', 'png'] },
+  imageFormat: { type: 'string', enum: ['jpeg', 'png', 'pdf'] },
   quality: { type: 'integer', minimum: 0, maximum: 100 },
   responseFormat: { type: 'string', enum: ['zip'] }
 }
@@ -56,6 +56,12 @@ function generateTaskId() {
   return uuid().new()
 }
 
+function captureOptionsValidate(options: CaptureOptions) {
+  if (options.imageFormat === 'pdf' && options.selector) {
+    throw new Error('PDF format does not support selector')
+  }
+}
+
 async function captureController(
   req: FastifyRequest<{
     Body: Partial<CaptureRequestBodyType>
@@ -72,6 +78,8 @@ async function captureController(
   if (options.imageFormat === 'png') {
     options.quality = undefined
   }
+
+  captureOptionsValidate(options)
 
   server.log.info({ body: req.body }, 'CaptureController: income')
   server.log.info({ options }, 'CaptureController: options')
@@ -125,6 +133,8 @@ async function captureOneController(
     options.quality = undefined
   }
 
+  captureOptionsValidate(options)
+
   server.log.info({ query: req.query }, 'CaptureOneController: income')
   server.log.info({ options }, 'CaptureOneController: options')
 
@@ -148,7 +158,8 @@ async function captureOneController(
     reply.headers({
       'Content-Type': {
         jpeg: 'application/jpeg; charset=utf-8',
-        png: 'application/png; charset=utf-8'
+        png: 'application/png; charset=utf-8',
+        pdf: 'application/pdf; charset=utf-8'
       }[options.imageFormat],
       'Content-Disposition': `attachment; filename="${taskId}.${options.imageFormat}"`
     })

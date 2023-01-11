@@ -4,7 +4,7 @@ export type CaptureBaseType = {
   viewportWidth: number
   viewportHeight: number
   selector?: string
-  imageFormat?: 'png' | 'jpeg'
+  imageFormat?: 'png' | 'jpeg' | 'pdf'
   quality?: number
   responseFormat?: 'zip'
 }
