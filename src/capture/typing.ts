@@ -11,6 +11,7 @@ export type CaptureBaseType = {
 
 export type CaptureRequestBodyType = CaptureBaseType & {
   urls: string[]
+  filenames?: string[]
 }
 
 export type CaptureRequestQuerystringType = CaptureBaseType & {
@@ -32,6 +33,7 @@ export type CaptureTaskJob = {
   url: string
   index: number
   status: 'pending' | 'done' | 'error'
+  filename?: string
   file?: string
   error?: Error
 }

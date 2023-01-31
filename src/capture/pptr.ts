@@ -48,7 +48,7 @@ async function openPageAndCapture(
 ) {
   const filePath = resolveTempFilePath(
     taskId,
-    `${job.index}.${options.imageFormat}`
+    `${job.filename || job.index}.${options.imageFormat}`
   )
 
   async function getPageHeight() {

@@ -40,6 +40,12 @@ const bodyJSONSchema = {
       items: { type: 'string', format: 'uri' },
       minItems: 1,
       maxItems: 100
+    },
+    filenames: {
+      type: 'array',
+      items: { type: 'string' },
+      minItems: 1,
+      maxItems: 100
     }
   } as Record<keyof CaptureRequestBodyType, any>
 }
@@ -59,6 +65,9 @@ function generateTaskId() {
 function captureOptionsValidate(options: CaptureOptions) {
   if (options.imageFormat === 'pdf' && options.selector) {
     throw new Error('PDF format does not support selector')
+  }
+  if (options.filenames && options.urls.length !== options.filenames.length) {
+    throw new Error('URLs and filenames must be the same length')
   }
 }
 
@@ -89,8 +98,9 @@ async function captureController(
   const task: CaptureTask = {
     taskId,
     jobs: options.urls.map((url, index) => ({
-      url: options.urls[0],
+      url,
       index,
+      filename: options.filenames?.[index],
       status: 'pending'
     })),
     options
