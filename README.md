@@ -9,18 +9,29 @@
 | Params         | Type     | Description                                                  |
 | -------------- | -------- | ------------------------------------------------------------ |
 | urls           | string[] | **页面地址**<br />**必填**，最大长度 100。                   |
+| filenames      | string[] | 指定页面截图文件名，不需要带入后缀名。<br />未传入 `filenames` 时，按页面在 `urls` 中的下标作为文件名，如 `0.jpeg` `1.jpeg` |
 | viewportWidth  | number   | **浏览器窗口大小**<br />默认值：375。                        |
 | viewportHeight | number   | 默认值：667<br />截取整个页面时，忽略该参数                  |
 | selector       | string   | **截取指定元素**<br />传入的 `selector` 语法参照 `document.querySelector`。<br />不指定时，截取整个页面。 |
 | imageFormat    | string   | **图片格式**<br />格式：`jpeg`  `png` `pdf`。默认值：`jpeg`。 |
 | quality        | number   | **图片质量**<br />针对 `jpeg`<br />格式：0-100。默认值：80。 |
-| responseFormat | string   | **返回的文件流格式**<br />格式： `zip`。                     |
+| responseFormat | string   | **返回的文件流格式**<br />格式： `zip`。<br />默认值：`zip`  |
 
 #### Response
 
-zip 格式的二进制流
+HTTP Status
 
-截图文件将按页面在 `urls` 中的下标作为文件名，如 `0.jpeg` `1.jpeg` ...
+- 200
+
+  zip 格式的二进制流，`content-type: application/zip`
+
+- 400
+
+  参数错误
+
+- 500
+
+  内部错误
 
 #### Example
 
