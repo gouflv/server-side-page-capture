@@ -167,9 +167,9 @@ async function captureOneController(
 
     reply.headers({
       'Content-Type': {
-        jpeg: 'application/jpeg; charset=utf-8',
-        png: 'application/png; charset=utf-8',
-        pdf: 'application/pdf; charset=utf-8'
+        jpeg: 'image/jpeg',
+        png: 'image/png',
+        pdf: 'image/pdf'
       }[options.imageFormat],
       'Content-Disposition': `attachment; filename="${taskId}.${options.imageFormat}"`
     })
