@@ -22,16 +22,14 @@
 HTTP Status
 
 - 200
-
-  zip 格式的二进制流，`content-type: application/zip`
+  - zip 格式的二进制流，`content-type: application/zip`
 
 - 400
-
-  参数错误
+  - 参数错误
 
 - 500
+  - 内部错误
 
-  内部错误
 
 #### Example
 
