@@ -1,4 +1,4 @@
-import pptr, { Browser, PDFOptions, ScreenshotOptions } from 'puppeteer'
+import pptr, { Browser, Page, PDFOptions, ScreenshotOptions } from 'puppeteer'
 import { server } from '..'
 import { cleanTemp, mkdirTemp, resolveTempFilePath } from './file'
 import { CaptureOptions, CaptureTask } from './typing'
@@ -15,7 +15,10 @@ export async function captureRunner(task: CaptureTask) {
   try {
     for (const job of jobs) {
       server.log.debug(`job[${job.index}] start`)
-      job.file = await openPageAndCapture(taskId, browser, job, options)
+
+      const page = await openPage(browser, options)
+
+      job.file = await createCapture(options, page, taskId, job)
     }
     server.log.info({ task }, 'captureRunner done')
     return task
@@ -40,11 +43,24 @@ async function launch(options: CaptureOptions) {
   return browser
 }
 
-async function openPageAndCapture(
+async function openPage(browser: Browser, options: CaptureOptions) {
+  const page = await browser.newPage()
+
+  page.setDefaultTimeout(10_000)
+
+  await page.setViewport({
+    width: options.viewportWidth,
+    height: options.viewportHeight
+  })
+
+  return page
+}
+
+async function createCapture(
+  options: CaptureOptions,
+  page: Page,
   taskId: string,
-  browser: Browser,
-  job: CaptureTask['jobs'][number],
-  options: CaptureOptions
+  job: CaptureTask['jobs'][number]
 ) {
   const filePath = resolveTempFilePath(
     taskId,
@@ -70,15 +86,6 @@ async function openPageAndCapture(
     }
     await el.screenshot(opts)
   }
-
-  const page = await browser.newPage()
-
-  page.setDefaultTimeout(10_000)
-
-  await page.setViewport({
-    width: options.viewportWidth,
-    height: options.viewportHeight
-  })
 
   try {
     await page.goto(job.url, { waitUntil: 'networkidle0' })
