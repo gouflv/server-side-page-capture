@@ -8,25 +8,41 @@ const isHeadFull = process.env.HEAD_FULL ? true : false
 export async function captureRunner(task: CaptureTask) {
   const { taskId, jobs, options } = task
 
+  const time = Date.now()
+
+  server.log.info(
+    { taskId: task.taskId, jobs: jobs.length },
+    'captureRunner start'
+  )
+
   const browser = await launch(options)
 
   await mkdirTemp(taskId)
 
   try {
     for (const job of jobs) {
-      server.log.debug(`job[${job.index}] start`)
+      server.log.debug(
+        {
+          url: job.url
+        },
+        `job[${job.index}] start`
+      )
 
       const page = await openPage(browser, options)
 
       job.file = await createCapture(options, page, taskId, job)
     }
-    server.log.info({ task }, 'captureRunner done')
     return task
   } catch (error) {
     cleanTemp(taskId)
     throw error
   } finally {
     if (!isHeadFull) await browser.close()
+    const duration = (Date.now() - time) / 1000
+    server.log.info(
+      { taskId: task.taskId, jobs: jobs.length, duration },
+      'captureRunner end'
+    )
   }
 }
 

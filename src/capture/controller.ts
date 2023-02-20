@@ -77,38 +77,37 @@ async function captureController(
   }>,
   reply: FastifyReply
 ) {
-  const { body } = req
+  server.log.debug({ body: req.body }, 'CaptureController: income')
 
+  const { body } = req
   const options: CaptureOptions = {
     ...defaultOptions,
     ...(body as any)
   }
-
   if (options.imageFormat === 'png') {
     options.quality = undefined
   }
 
   captureOptionsValidate(options)
 
-  server.log.info({ body: req.body }, 'CaptureController: income')
-  server.log.info({ options }, 'CaptureController: options')
+  server.log.debug({ options }, 'CaptureController: options')
 
   const taskId = generateTaskId()
 
-  const task: CaptureTask = {
-    taskId,
-    jobs: options.urls.map((url, index) => ({
-      url,
-      index,
-      filename: options.filenames?.[index],
-      status: 'pending'
-    })),
-    options
-  }
-
-  server.log.info({ task }, 'CaptureOneController: task')
-
   try {
+    const task: CaptureTask = {
+      taskId,
+      jobs: options.urls.map((url, index) => ({
+        url,
+        index,
+        filename: options.filenames?.[index],
+        status: 'pending'
+      })),
+      options
+    }
+
+    server.log.debug({ task }, 'CaptureOneController: task')
+
     const captureResult = await captureRunner(task)
     const buffer = await packageTaskFilesToBuffer(captureResult)
 
@@ -131,51 +130,50 @@ async function captureOneController(
   req: FastifyRequest<{ Querystring: CaptureRequestQuerystringType }>,
   reply: FastifyReply
 ) {
-  const { query } = req
+  server.log.debug({ query: req.query }, 'CaptureOneController: income')
 
+  const { query } = req
   const options: CaptureOptions = {
     ...defaultOptions,
     ...(query as any),
     urls: [query.url]
   }
-
   if (options.imageFormat === 'png') {
     options.quality = undefined
   }
 
   captureOptionsValidate(options)
 
-  server.log.info({ query: req.query }, 'CaptureOneController: income')
-  server.log.info({ options }, 'CaptureOneController: options')
+  server.log.debug({ options }, 'CaptureOneController: options')
 
   const taskId = generateTaskId()
 
-  const task: CaptureTask = {
-    taskId,
-    jobs: [
-      {
-        url: options.urls[0],
-        index: 0,
-        status: 'pending'
-      }
-    ],
-    options
-  }
-
   try {
+    const task: CaptureTask = {
+      taskId,
+      jobs: [
+        {
+          url: options.urls[0],
+          index: 0,
+          status: 'pending'
+        }
+      ],
+      options
+    }
+
     const captureResult = await captureRunner(task)
-
-    reply.headers({
-      'Content-Type': {
-        jpeg: 'image/jpeg',
-        png: 'image/png',
-        pdf: 'image/pdf'
-      }[options.imageFormat],
-      'Content-Disposition': `attachment; filename="${taskId}.${options.imageFormat}"`
-    })
-
     const buffer = await fs.readFile(captureResult.jobs[0].file!)
-    reply.send(buffer)
+
+    reply
+      .headers({
+        'Content-Type': {
+          jpeg: 'image/jpeg',
+          png: 'image/png',
+          pdf: 'image/pdf'
+        }[options.imageFormat],
+        'Content-Disposition': `attachment; filename="${taskId}.${options.imageFormat}"`
+      })
+      .send(buffer)
   } catch (error) {
     throw error
   } finally {

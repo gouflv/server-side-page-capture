@@ -2,14 +2,22 @@ import fastify from 'fastify'
 import * as CaptureController from './capture/controller'
 
 export const server = fastify({
-  logger: {
-    level: 'debug'
-  }
+  logger:
+    process.env.NODE_ENV === 'production'
+      ? {
+          level: 'info'
+        }
+      : {
+          level: 'debug',
+          transport: {
+            target: 'pino-pretty'
+          }
+        }
 })
 
 CaptureController.register()
 
-server.get('/ping', async (request, reply) => {
+server.get('/ping', async () => {
   return 'pong!'
 })
 
